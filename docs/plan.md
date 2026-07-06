@@ -240,15 +240,17 @@ gantt
 ## 6. 各フェーズ詳細
 
 ### Phase 0 — アプリ準備(Jenkins 未使用)
-**成果物**：ローカルで動く Go アプリ + Dockerfile
+**成果物**：ローカルで動く Go アプリ + Dockerfile + テスト
 
 - `app/main.go`：`/healthz` を返すだけのHTTPサーバ(ポート8080)
+- `app/main_test.go`：`healthzHandler` のテスト(`httptest` 使用)
 - `app/go.mod`、`app/Dockerfile`(マルチステージビルド)
-- ローカルで `go run` / `podman build` / `podman run` で動作確認
+- ローカルで `go test` / `go run` / `podman build` / `podman run` で動作確認
 
-**学習ポイント**：Go 最小構成、マルチステージ Dockerfile、イメージサイズ最適化、Podman による rootless ビルド
+**学習ポイント**：Go 最小構成、`httptest` によるハンドラテスト、マルチステージ Dockerfile、イメージサイズ最適化、Podman による rootless ビルド
 
 **✅ 完了条件(この時点で動作することが保証される状態)**：
+- `go test ./...` が成功(テストが通る)
 - `go run main.go` → `curl localhost:8080/healthz` が 200 OK
 - `podman build -t go-app .` が成功
 - `podman run -p 8080:8080 go-app` → curl で 200 OK
@@ -406,11 +408,11 @@ sequenceDiagram
 ```
 jenkins-gitops-k8s/
 ├── app/                         # Go アプリ
-│   ├── main.go
+│   ├── main.go                  # エントリポイント(最小)
+│   ├── main_test.go             # テストは対象と同ディレクトリに並置(Go 慣習)
 │   ├── go.mod
-│   ├── go.sum
-│   ├── Dockerfile
-│   └── test/
+│   ├── go.sum                   # 外部依存を入れた場合のみ
+│   └── Dockerfile
 ├── iac/                         # Terraform
 │   ├── modules/
 │   │   ├── jenkins-vm/

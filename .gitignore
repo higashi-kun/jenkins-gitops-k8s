@@ -1,0 +1,13 @@
+# Go
+go-app
+/app/app
+*.exe
+*.test
+*.out
+
+# エディタ/OS
+.DS_Store
+*.swp
+*~
+.idea/
+.vscode/
